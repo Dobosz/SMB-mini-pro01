@@ -1,19 +1,28 @@
-package pl.dobosz.smb01.app;
+package pl.dobosz.smb01.app.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import pl.dobosz.smb01.app.R;
+import pl.dobosz.smb01.app.adapters.CartAdapter;
 
 
 public class MainActivity extends Activity {
+
+    @Bind(R.id.shopping_list)
+    ListView shoppingList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        shoppingList.setAdapter(new CartAdapter(this));
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -36,4 +45,5 @@ public class MainActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
