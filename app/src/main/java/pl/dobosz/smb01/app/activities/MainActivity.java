@@ -37,6 +37,11 @@ public class MainActivity extends Activity {
             shoppingList.setItemChecked(i, false);
     }
 
+    @OnClick(R.id.delete_button)
+    public void deleteButtonClick() {
+        cart.remove(position);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
