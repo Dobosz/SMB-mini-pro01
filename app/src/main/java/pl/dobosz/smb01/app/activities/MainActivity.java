@@ -1,30 +1,28 @@
 package pl.dobosz.smb01.app.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.ActionMode;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 import butterknife.*;
-import butterknife.internal.ListenerClass;
 import pl.dobosz.smb01.app.R;
 import pl.dobosz.smb01.app.adapters.CartAdapter;
 import pl.dobosz.smb01.app.models.CartItem;
+import pl.dobosz.smb01.app.providers.CartProvider;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
 public class MainActivity extends Activity {
 
-    List<CartItem> cart = new ArrayList<>();
+    private CartProvider cartProvider;
+    private CartAdapter cartAdapter;
 
     @Bind(R.id.shopping_list)
     ListView shoppingList;
@@ -37,9 +35,25 @@ public class MainActivity extends Activity {
             shoppingList.setItemChecked(i, false);
     }
 
+    @OnClick(R.id.add_button)
+    public void addButtonClick() {
+        startActivity(new Intent(this, AddActivity.class));
+    }
+
     @OnClick(R.id.delete_button)
     public void deleteButtonClick() {
-        cart.remove(position);
+        SparseBooleanArray checkedItemPositions = shoppingList.getCheckedItemPositions().clone();
+        int size = cartAdapter.getCount();
+        for (int i = 0; i != size; i++)
+            shoppingList.setItemChecked(i, false);
+        int deletedOffset = 0;
+        for (int i = 0; i != size; i++) {
+            if (checkedItemPositions.get(i)) {
+                CartItem cartItem = cartAdapter.getItem(i - deletedOffset++);
+                cartProvider.deleteCartItem(cartItem);
+                cartAdapter.remove(cartItem);
+            }
+        }
     }
 
     @Override
@@ -47,19 +61,10 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        cart.add(new CartItem("n01", "d01", 1));
-        cart.add(new CartItem("n02", "d02", 10));
-        cart.add(new CartItem("n03", "d03", 100));
-        cart.add(new CartItem("n04", "d04", 200));
-        cart.add(new CartItem("n05", "d05", 200));
-        cart.add(new CartItem("n06", "d06", 200));
-        cart.add(new CartItem("n07", "d07", 200));
-        cart.add(new CartItem("n08", "d08", 200));
-        cart.add(new CartItem("n09", "d09", 200));
-        cart.add(new CartItem("n10", "d10", 200));
-        cart.add(new CartItem("n11", "d11", 200));
-        cart.add(new CartItem("n12", "d12", 200));
-        shoppingList.setAdapter(new CartAdapter(this, -1, cart));
+        cartProvider = new CartProvider(this);
+        cartProvider.addCardItem(new CartItem("n01", "d01", 1));
+        cartAdapter = new CartAdapter(this, -1, cartProvider.fetchCartItems());
+        shoppingList.setAdapter(cartAdapter);
     }
 
     @Override
