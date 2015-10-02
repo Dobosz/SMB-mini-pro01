@@ -1,8 +1,12 @@
 package pl.dobosz.smb01.app.activities;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,17 +19,28 @@ import pl.dobosz.smb01.app.adapters.CartAdapter;
 import pl.dobosz.smb01.app.models.CartItem;
 import pl.dobosz.smb01.app.providers.CartProvider;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class MainActivity extends Activity {
 
+    public static final String SHOPPING_LIST_ADD = "shopping.list.add";
+    public static final String CARD_ITEM_TAG = "card.item.tag";
     private CartProvider cartProvider;
     private CartAdapter cartAdapter;
 
     @Bind(R.id.shopping_list)
     ListView shoppingList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        cartProvider = new CartProvider(this);
+        cartAdapter = new CartAdapter(this, -1, cartProvider.fetchCartItems());
+        shoppingList.setAdapter(cartAdapter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver,
+                new IntentFilter(SHOPPING_LIST_ADD));
+    }
 
     @OnItemClick(R.id.shopping_list)
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -57,36 +72,38 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        cartProvider = new CartProvider(this);
-        cartProvider.addCardItem(new CartItem("n01", "d01", 1));
-        cartAdapter = new CartAdapter(this, -1, cartProvider.fetchCartItems());
-        shoppingList.setAdapter(cartAdapter);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_check_all) {
+            checkAll();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void checkAll() {
+        int size = cartAdapter.getCount();
+        for (int i = 0; i != size; i++)
+            shoppingList.setItemChecked(i, true);
+    }
+
+    private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            cartAdapter.add((CartItem)intent.getSerializableExtra(CARD_ITEM_TAG));
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
+        super.onDestroy();
+    }
 }

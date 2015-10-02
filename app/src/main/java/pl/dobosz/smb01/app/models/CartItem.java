@@ -1,9 +1,11 @@
 package pl.dobosz.smb01.app.models;
 
+import java.io.Serializable;
+
 /**
  * Created by dobosz on 9/29/15.
  */
-public class CartItem {
+public class CartItem implements Serializable{
 
     private long id;
     private String name;
