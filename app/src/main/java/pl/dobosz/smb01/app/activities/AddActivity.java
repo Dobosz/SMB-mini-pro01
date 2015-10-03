@@ -9,6 +9,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.dobosz.smb01.app.R;
+import pl.dobosz.smb01.app.directories.CartItemsDirectory;
 import pl.dobosz.smb01.app.models.CartItem;
 import pl.dobosz.smb01.app.providers.CartProvider;
 
@@ -23,14 +24,14 @@ public class AddActivity extends Activity {
     @Bind(R.id.edit_quantity)
     EditText editQuantity;
 
-    private CartProvider cartProvider;
+    private CartItemsDirectory cartItemsDirectory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
         ButterKnife.bind(this);
-        cartProvider = new CartProvider(this);
+        cartItemsDirectory = new CartItemsDirectory(this);
     }
 
     @OnClick(R.id.add_item_button)
@@ -40,7 +41,7 @@ public class AddActivity extends Activity {
         final int quantity = Integer.parseInt(editQuantity.getText().toString());
         final CartItem cartItem = new CartItem(name, description, quantity);
         final Intent intent = new Intent(MainActivity.SHOPPING_LIST_ADD);
-        cartProvider.addCardItem(cartItem);
+        cartItemsDirectory.addCardItem(cartItem);
         intent.putExtra(MainActivity.CARD_ITEM_TAG, cartItem);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         finish();

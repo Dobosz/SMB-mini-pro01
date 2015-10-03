@@ -16,6 +16,7 @@ import android.widget.ListView;
 import butterknife.*;
 import pl.dobosz.smb01.app.R;
 import pl.dobosz.smb01.app.adapters.CartAdapter;
+import pl.dobosz.smb01.app.directories.CartItemsDirectory;
 import pl.dobosz.smb01.app.models.CartItem;
 import pl.dobosz.smb01.app.providers.CartProvider;
 
@@ -24,7 +25,7 @@ public class MainActivity extends Activity {
 
     public static final String SHOPPING_LIST_ADD = "shopping.list.add";
     public static final String CARD_ITEM_TAG = "card.item.tag";
-    private CartProvider cartProvider;
+    private CartItemsDirectory cartItemsDirectory;
     private CartAdapter cartAdapter;
 
     @Bind(R.id.shopping_list)
@@ -35,8 +36,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        cartProvider = new CartProvider(this);
-        cartAdapter = new CartAdapter(this, -1, cartProvider.fetchCartItems());
+        cartItemsDirectory = new CartItemsDirectory(this);
+        cartAdapter = new CartAdapter(this, -1, cartItemsDirectory.fetchAllCartItems());
         shoppingList.setAdapter(cartAdapter);
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver,
                 new IntentFilter(SHOPPING_LIST_ADD));
@@ -51,7 +52,7 @@ public class MainActivity extends Activity {
     }
 
     private void changeMarkedState(int i, boolean marked) {
-        cartProvider.updateMark(cartAdapter.getItem(i), marked);
+        cartItemsDirectory.updateMark(cartAdapter.getItem(i), marked);
         shoppingList.setItemChecked(i, marked);
     }
 
@@ -70,7 +71,7 @@ public class MainActivity extends Activity {
         for (int i = 0; i != size; i++) {
             if (checkedItemPositions.get(i)) {
                 CartItem cartItem = cartAdapter.getItem(i - deletedOffset++);
-                cartProvider.deleteCartItem(cartItem);
+                cartItemsDirectory.deleteCartItem(cartItem);
                 cartAdapter.remove(cartItem);
             }
         }
@@ -94,9 +95,10 @@ public class MainActivity extends Activity {
     }
 
     private void checkAll() {
-        int size = cartAdapter.getCount();
-        for (int i = 0; i != size; i++)
+        for (int i = 0; i != cartAdapter.getCount(); i++) {
+            cartItemsDirectory.updateMark(cartAdapter.getItem(i), true);
             shoppingList.setItemChecked(i, true);
+        }
     }
 
     private BroadcastReceiver messageReceiver = new BroadcastReceiver() {

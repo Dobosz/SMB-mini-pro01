@@ -20,6 +20,10 @@
             android:name=".activities.AddActivity"
             android:label="@string/title_activity_add" >
         </activity>
+        <provider
+                android:name=".providers.CartProvider"
+                android:authorities="pl.dobosz.smb01.app.providers.CartProvider"
+                android:exported="true"/>
     </application>
 
 </manifest>
