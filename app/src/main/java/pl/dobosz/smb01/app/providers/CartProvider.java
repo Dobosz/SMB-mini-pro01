@@ -10,9 +10,6 @@ import pl.dobosz.smb01.app.models.CartItem;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by dobosz on 10/1/15.
- */
 public class CartProvider {
 
     private CartDbHelper cartDbHelper;
@@ -21,7 +18,8 @@ public class CartProvider {
             CartDbHelper.CartEntry._ID,
             CartDbHelper.CartEntry.COLUMN_NAME_NAME,
             CartDbHelper.CartEntry.COLUMN_NAME_DESCRIPTION,
-            CartDbHelper.CartEntry.COLUMN_NAME_QUANTITY
+            CartDbHelper.CartEntry.COLUMN_NAME_QUANTITY,
+            CartDbHelper.CartEntry.COLUMN_NAME_MARKED
     };
 
     public CartProvider(Context context) {
@@ -34,6 +32,7 @@ public class CartProvider {
         values.put(CartDbHelper.CartEntry.COLUMN_NAME_NAME, cartItem.getName());
         values.put(CartDbHelper.CartEntry.COLUMN_NAME_DESCRIPTION, cartItem.getDescription());
         values.put(CartDbHelper.CartEntry.COLUMN_NAME_QUANTITY, cartItem.getQuantity());
+        values.put(CartDbHelper.CartEntry.COLUMN_NAME_MARKED, false);
         long newId = db.insert(
                 CartDbHelper.CartEntry.TABLE_NAME,
                 null,
@@ -44,7 +43,7 @@ public class CartProvider {
     public void deleteCartItem(CartItem cartItem) {
         SQLiteDatabase db = cartDbHelper.getWritableDatabase();
         String selection = CartDbHelper.CartEntry._ID + " = ?";
-        String[] selectionArgs = { String.valueOf(cartItem.getId()) };
+        String[] selectionArgs = {String.valueOf(cartItem.getId())};
         db.delete(CartDbHelper.CartEntry.TABLE_NAME, selection, selectionArgs);
     }
 
@@ -65,15 +64,26 @@ public class CartProvider {
 
     private List<CartItem> getCartItems(Cursor cursor) {
         List<CartItem> cartItems = new ArrayList<>();
-        while(cursor.moveToNext()) {
+        while (cursor.moveToNext()) {
             CartItem cartItem = new CartItem();
             cartItem.setId(cursor.getLong(cursor.getColumnIndexOrThrow(CartDbHelper.CartEntry._ID)));
             cartItem.setName(cursor.getString(cursor.getColumnIndexOrThrow(CartDbHelper.CartEntry.COLUMN_NAME_NAME)));
             cartItem.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(CartDbHelper.CartEntry.COLUMN_NAME_DESCRIPTION)));
             cartItem.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(CartDbHelper.CartEntry.COLUMN_NAME_QUANTITY)));
+            cartItem.setMarked(cursor.getInt(cursor.getColumnIndexOrThrow(CartDbHelper.CartEntry.COLUMN_NAME_MARKED)) != 0);
             cartItems.add(cartItem);
         }
         return cartItems;
+    }
+
+    public void updateMark(CartItem cartItem, boolean marked) {
+        SQLiteDatabase db = cartDbHelper.getReadableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(CartDbHelper.CartEntry.COLUMN_NAME_MARKED, marked ? 1 : 0);
+        String selection = CartDbHelper.CartEntry._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(cartItem.getId())};
+        db.update(CartDbHelper.CartEntry.TABLE_NAME, values, selection, selectionArgs);
+        cartItem.setMarked(marked);
     }
 
 }

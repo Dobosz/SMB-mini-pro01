@@ -45,9 +45,14 @@ public class MainActivity extends Activity {
     @OnItemClick(R.id.shopping_list)
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         if (shoppingList.isItemChecked(i))
-            shoppingList.setItemChecked(i, true);
+            changeMarkedState(i, true);
         else
-            shoppingList.setItemChecked(i, false);
+            changeMarkedState(i, false);
+    }
+
+    private void changeMarkedState(int i, boolean marked) {
+        cartProvider.updateMark(cartAdapter.getItem(i), marked);
+        shoppingList.setItemChecked(i, marked);
     }
 
     @OnClick(R.id.add_button)
@@ -97,7 +102,7 @@ public class MainActivity extends Activity {
     private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            cartAdapter.add((CartItem)intent.getSerializableExtra(CARD_ITEM_TAG));
+            cartAdapter.add((CartItem) intent.getSerializableExtra(CARD_ITEM_TAG));
         }
     };
 

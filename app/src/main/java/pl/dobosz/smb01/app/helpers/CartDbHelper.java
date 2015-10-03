@@ -16,8 +16,9 @@ public class CartDbHelper extends SQLiteOpenHelper {
         public static final String COLUMN_NAME_NAME= "name";
         public static final String COLUMN_NAME_DESCRIPTION = "description";
         public static final String COLUMN_NAME_QUANTITY = "quantity";
+        public static final String COLUMN_NAME_MARKED = "marked";
     }
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "Cart.db";
     private static final String TEXT_TYPE = " TEXT";
     private static final String INTEGER_TYPE = " INTEGER";
@@ -27,7 +28,8 @@ public class CartDbHelper extends SQLiteOpenHelper {
                     CartEntry._ID + " INTEGER PRIMARY KEY," +
                     CartEntry.COLUMN_NAME_NAME + TEXT_TYPE + COMMA_SEP +
                     CartEntry.COLUMN_NAME_DESCRIPTION + TEXT_TYPE + COMMA_SEP +
-                    CartEntry.COLUMN_NAME_QUANTITY + INTEGER_TYPE +
+                    CartEntry.COLUMN_NAME_QUANTITY + INTEGER_TYPE + COMMA_SEP +
+                    CartEntry.COLUMN_NAME_MARKED + INTEGER_TYPE +
             " )";
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + CartEntry.TABLE_NAME;

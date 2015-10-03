@@ -46,6 +46,7 @@ public class CartAdapter extends ArrayAdapter<CartItem> {
         holder.description.setText(cartItem.getDescription());
         holder.quantity.setText(Integer.toString(cartItem.getQuantity()));
         ListView shoppingList = (ListView) viewGroup;
+        shoppingList.setItemChecked(i, cartItem.isMarked());
         if(shoppingList.isItemChecked(i))
             holder.checkBox.setChecked(true);
         else

@@ -11,6 +11,7 @@ public class CartItem implements Serializable{
     private String name;
     private String description;
     private int quantity;
+    private boolean marked;
 
     public CartItem() {
     }
@@ -53,4 +54,11 @@ public class CartItem implements Serializable{
         this.quantity = quantity;
     }
 
+    public boolean isMarked() {
+        return marked;
+    }
+
+    public void setMarked(boolean marked) {
+        this.marked = marked;
+    }
 }
