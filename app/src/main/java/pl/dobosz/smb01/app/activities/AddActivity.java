@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.EditText;
+import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -38,8 +39,12 @@ public class AddActivity extends Activity {
     void addButtonClick() {
         final String name = editName.getText().toString();
         final String description = editDescription.getText().toString();
-        final int quantity = Integer.parseInt(editQuantity.getText().toString());
-        final CartItem cartItem = new CartItem(name, description, quantity);
+        final String quantity = editQuantity.getText().toString();
+        if (name.isEmpty() || description.isEmpty() || quantity.isEmpty()) {
+            Toast.makeText(this, "Please fill up all the fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final CartItem cartItem = new CartItem(name, description, Integer.parseInt(quantity));
         final Intent intent = new Intent(MainActivity.SHOPPING_LIST_ADD);
         cartItemsDirectory.addCardItem(cartItem);
         intent.putExtra(MainActivity.CARD_ITEM_TAG, cartItem);
