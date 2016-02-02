@@ -13,19 +13,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import butterknife.*;
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnItemClick;
 import pl.dobosz.smb01.app.R;
 import pl.dobosz.smb01.app.adapters.CartAdapter;
 import pl.dobosz.smb01.app.directories.CartItemsDirectory;
+import pl.dobosz.smb01.app.directories.OnlineCartItemDirectoryImp;
 import pl.dobosz.smb01.app.models.CartItem;
-import pl.dobosz.smb01.app.providers.CartProvider;
 
 
 public class MainActivity extends Activity {
 
     public static final String SHOPPING_LIST_ADD = "shopping.list.add";
     public static final String CARD_ITEM_TAG = "card.item.tag";
-    private CartItemsDirectory cartItemsDirectory;
+    private OnlineCartItemDirectoryImp cartItemsDirectory;
     private CartAdapter cartAdapter;
 
     @Bind(R.id.shopping_list)
@@ -36,8 +39,10 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        cartItemsDirectory = new CartItemsDirectory(this);
-        cartAdapter = new CartAdapter(this, -1, cartItemsDirectory.fetchAllCartItems());
+        cartItemsDirectory = new OnlineCartItemDirectoryImp();
+        cartAdapter = new CartAdapter(this, -1, cartItemsDirectory.cartItems);
+        cartItemsDirectory.setAdapter(cartAdapter);
+        cartItemsDirectory.fetchAllCartItems();
         shoppingList.setAdapter(cartAdapter);
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver,
                 new IntentFilter(SHOPPING_LIST_ADD));
@@ -54,6 +59,7 @@ public class MainActivity extends Activity {
     private void changeMarkedState(int i, boolean marked) {
         cartItemsDirectory.updateMark(cartAdapter.getItem(i), marked);
         shoppingList.setItemChecked(i, marked);
+        shoppingList.deferNotifyDataSetChanged();
     }
 
     @OnClick(R.id.add_button)

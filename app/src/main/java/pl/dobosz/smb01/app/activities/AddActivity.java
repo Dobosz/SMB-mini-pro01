@@ -11,8 +11,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.dobosz.smb01.app.R;
 import pl.dobosz.smb01.app.directories.CartItemsDirectory;
+import pl.dobosz.smb01.app.directories.OnlineCartItemDirectoryImp;
 import pl.dobosz.smb01.app.models.CartItem;
-import pl.dobosz.smb01.app.providers.CartProvider;
 
 public class AddActivity extends Activity {
 
@@ -32,7 +32,7 @@ public class AddActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
         ButterKnife.bind(this);
-        cartItemsDirectory = new CartItemsDirectory(this);
+        cartItemsDirectory = new OnlineCartItemDirectoryImp();
     }
 
     @OnClick(R.id.add_item_button)
